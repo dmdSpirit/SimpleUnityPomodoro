@@ -9,13 +9,31 @@ namespace SimplePomodoro
     public class Timer : MonoBehaviour
     {
         private TimeSpan _time;
-        private bool _isRunning;
+        private TimerState _timerState;
 
         [SerializeField]
-        private int _minutes;
+        private int _workDuration;
 
         [SerializeField]
-        private Button _startTimerButton = null!;
+        private int _restDuration;
+
+        [SerializeField]
+        private Image _icon = null!;
+
+        [SerializeField]
+        private Sprite _workIcon = null!;
+
+        [SerializeField]
+        private Sprite _restIcon = null!;
+
+        [SerializeField]
+        private Button _startWorkButton = null!;
+
+        [SerializeField]
+        private Button _startRestButton = null!;
+
+        [SerializeField]
+        private Button _pauseButton = null!;
 
         [SerializeField]
         private Button _stopTimerButton = null!;
@@ -23,20 +41,34 @@ namespace SimplePomodoro
         [SerializeField]
         private TMP_Text _text = null!;
 
+        [SerializeField]
+        private TMP_Text _pauseButtonText = null!;
+
+        [SerializeField]
+        private string _pauseText = null!;
+
+        [SerializeField]
+        private string _resumeText = null!;
+
         private void Awake()
         {
-            _startTimerButton.onClick.AddListener(OnStartTimer);
-            _stopTimerButton.onClick.AddListener(OnStopTimer);
+            _startWorkButton.onClick.AddListener(OnStartWork);
+            _startRestButton.onClick.AddListener(OnStartRest);
+            _pauseButton.onClick.AddListener(OnPause);
+            _stopTimerButton.onClick.AddListener(OnStop);
         }
 
         private void Start()
         {
+            _icon.sprite = null;
+            _pauseButton.interactable = false;
+            _pauseButtonText.text = _pauseText;
             UpdateText();
         }
 
         private void Update()
         {
-            if (!_isRunning)
+            if (_timerState != TimerState.Playing)
             {
                 return;
             }
@@ -46,16 +78,53 @@ namespace SimplePomodoro
             UpdateText();
         }
 
-        private void OnStartTimer()
+        private void OnStartWork()
         {
-            _time = TimeSpan.FromMinutes(_minutes);
-            _isRunning = true;
+            _timerState = TimerState.Playing;
+            _icon.sprite = _workIcon;
+            _time = TimeSpan.FromMinutes(_workDuration);
+            _pauseButton.interactable = true;
+            _pauseButtonText.text = _pauseText;
             UpdateText();
         }
 
-        private void OnStopTimer()
+        private void OnStartRest()
         {
-            _isRunning = false;
+            _timerState = TimerState.Playing;
+            _icon.sprite = _restIcon;
+            _time = TimeSpan.FromMinutes(_restDuration);
+            _pauseButton.interactable = true;
+            _pauseButtonText.text = _pauseText;
+            UpdateText();
+        }
+
+        private void OnStop()
+        {
+            _timerState = TimerState.Stopped;
+            _time = TimeSpan.Zero;
+            UpdateText();
+            _icon.sprite = null;
+            _pauseButton.interactable = false;
+            _pauseButtonText.text = _pauseText;
+        }
+
+        private void OnPause()
+        {
+            switch (_timerState)
+            {
+                case TimerState.Stopped:
+                    break;
+                case TimerState.Paused:
+                    _timerState = TimerState.Playing;
+                    _pauseButtonText.text = _pauseText;
+                    break;
+                case TimerState.Playing:
+                    _timerState = TimerState.Paused;
+                    _pauseButtonText.text = _resumeText;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void UpdateText()
