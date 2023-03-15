@@ -1,4 +1,5 @@
 ﻿#nullable enable
+
 using System;
 using TMPro;
 using UnityEngine;
@@ -10,12 +11,13 @@ namespace SimplePomodoro
     {
         private TimeSpan _time;
         private TimerState _timerState;
+        private bool _isWork;
 
         [SerializeField]
-        private int _workDuration;
+        private float _workDuration;
 
         [SerializeField]
-        private int _restDuration;
+        private float _restDuration;
 
         [SerializeField]
         private Image _icon = null!;
@@ -50,6 +52,12 @@ namespace SimplePomodoro
         [SerializeField]
         private string _resumeText = null!;
 
+        [SerializeField]
+        private WorkCounter _workCounter = null!;
+
+        [SerializeField]
+        private AudioSource _alarmSource = null!;
+
         private void Awake()
         {
             _startWorkButton.onClick.AddListener(OnStartWork);
@@ -74,6 +82,12 @@ namespace SimplePomodoro
             }
 
             float secondsLeft = Mathf.Max(0f, (float)(_time.TotalSeconds - Time.deltaTime));
+            if (secondsLeft == 0)
+            {
+                OnTimerFinished();
+                return;
+            }
+
             _time = TimeSpan.FromSeconds(secondsLeft);
             UpdateText();
         }
@@ -85,6 +99,7 @@ namespace SimplePomodoro
             _time = TimeSpan.FromMinutes(_workDuration);
             _pauseButton.interactable = true;
             _pauseButtonText.text = _pauseText;
+            _isWork = true;
             UpdateText();
         }
 
@@ -95,6 +110,7 @@ namespace SimplePomodoro
             _time = TimeSpan.FromMinutes(_restDuration);
             _pauseButton.interactable = true;
             _pauseButtonText.text = _pauseText;
+            _isWork = false;
             UpdateText();
         }
 
@@ -103,7 +119,6 @@ namespace SimplePomodoro
             _timerState = TimerState.Stopped;
             _time = TimeSpan.Zero;
             UpdateText();
-            _icon.sprite = null;
             _pauseButton.interactable = false;
             _pauseButtonText.text = _pauseText;
         }
@@ -130,6 +145,17 @@ namespace SimplePomodoro
         private void UpdateText()
         {
             _text.text = _time.ToString(@"hh\:mm\:ss");
+        }
+
+        private void OnTimerFinished()
+        {
+            if (_isWork)
+            {
+                _workCounter.AddCount();
+            }
+
+            _alarmSource.Play();
+            OnStop();
         }
     }
 }
