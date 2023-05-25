@@ -29,6 +29,7 @@ namespace SimplePomodoro.UI
         {
             _timer = AppStarter.Instance.SimpleTimer;
             _timer.OnTimerFinished += UpdateText;
+            _timer.OnDataLoaded += UpdateText;
             UpdateText();
         }
 

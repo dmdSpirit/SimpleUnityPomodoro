@@ -9,18 +9,26 @@ namespace SimplePomodoro.Data
     [Serializable]
     public sealed class Data
     {
-        public List<DateData> DateDatas=new();
+        public List<DateData> DateDatas = new();
 
         public void UpdateData(DateTime date, int workCount)
         {
-            DateData? data = DateDatas.FirstOrDefault(d => d.Date == date);
+            var dateString = date.ToString();
+            DateData? data = DateDatas.FirstOrDefault(d => string.Equals(d.Date, dateString));
             if (data == null)
             {
-                DateDatas.Add(new DateData(){Date = date, WorkCount = workCount});
+                DateDatas.Add(new DateData() { Date = dateString, WorkCount = workCount });
                 return;
             }
 
             data.WorkCount = workCount;
+        }
+
+        public int TodayWorkCount()
+        {
+            var dateString = DateTime.Today.ToString();
+            DateData? data = DateDatas.FirstOrDefault(d => string.Equals(d.Date, dateString));
+            return data?.WorkCount ?? 0;
         }
     }
 }

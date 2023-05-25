@@ -53,11 +53,12 @@ namespace SimplePomodoro
         {
             _ticker = GetComponent<Ticker>();
             DataToFileWriter = new DataToFileWriter();
-            SaveController = new SaveController(DataToFileWriter);
             SimpleTimer = new SimpleTimer(_timerSettings);
+            SaveController = new SaveController(DataToFileWriter, SimpleTimer);
             _ticker.Register(SimpleTimer);
         }
 
-        private void StartApp() { }
+        private void StartApp()
+            => SaveController.Load();
     }
 }

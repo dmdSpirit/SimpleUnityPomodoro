@@ -11,6 +11,7 @@ namespace SimplePomodoro
 
         public event Action? OnTimerFinished;
         public event Action? OnStateChanged;
+        public event Action? OnDataLoaded;
 
         public TimerState TimerState { get; private set; }
         public bool IsWork { get; private set; }
@@ -38,13 +39,16 @@ namespace SimplePomodoro
         }
 
         public void AddWorkCount()
-            => WorkCounter++;
+        {
+            WorkCounter++;
+            AppStarter.Instance.SaveController.Save();
+        }
 
         public void SubtractWorkCount()
         {
-            if (WorkCounter == 0)
-                return;
-            WorkCounter--;
+            if (WorkCounter > 0)
+                WorkCounter--;
+            AppStarter.Instance.SaveController.Save();
         }
 
         public void StartWork()
@@ -85,16 +89,23 @@ namespace SimplePomodoro
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             OnStateChanged?.Invoke();
         }
 
         private void TimerFinished()
         {
             if (IsWork)
-                WorkCounter++;
+                AddWorkCount();
 
             Stop();
             OnTimerFinished?.Invoke();
+        }
+
+        public void LoadWorkCount(int todayWorkCount)
+        {
+            WorkCounter = todayWorkCount;
+            OnDataLoaded?.Invoke();
         }
     }
 }

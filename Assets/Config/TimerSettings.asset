@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c70ded38531c40c4be0e81db3127b96f, type: 3}
   m_Name: TimerSettings
   m_EditorClassIdentifier: 
-  _workDuration: 0.1
-  _restDuration: 0.1
+  _workDuration: 40
+  _restDuration: 5
