@@ -1,14 +1,14 @@
 ﻿#nullable enable
-using System;
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SimplePomodoro
+namespace SimplePomodoro.UI
 {
     public class WorkCounter : MonoBehaviour
     {
-        private int _workCount;
+        private SimpleTimer _timer = null!;
 
         [SerializeField]
         private TMP_Text _workCountText = null!;
@@ -27,24 +27,24 @@ namespace SimplePomodoro
 
         private void Start()
         {
+            _timer = AppStarter.Instance.SimpleTimer;
+            _timer.OnTimerFinished += UpdateText;
             UpdateText();
         }
 
-        public void AddCount()
+        private void AddCount()
         {
-            _workCount++;
+            _timer.AddWorkCount();
             UpdateText();
         }
 
-        public void SubtractCount()
+        private void SubtractCount()
         {
-            _workCount--;
+            _timer.SubtractWorkCount();
             UpdateText();
         }
 
         private void UpdateText()
-        {
-            _workCountText.text = _workCount.ToString();
-        }
+            => _workCountText.text = _timer.WorkCounter.ToString();
     }
 }
