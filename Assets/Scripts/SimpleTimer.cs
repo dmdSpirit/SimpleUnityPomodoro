@@ -59,6 +59,14 @@ namespace SimplePomodoro
             OnStateChanged?.Invoke();
         }
 
+        public void StartWork(int time)
+        {
+            TimerState = TimerState.Playing;
+            Time = TimeSpan.FromMinutes(time);
+            IsWork = true;
+            OnStateChanged?.Invoke();
+        }
+
         public void StartRest()
         {
             TimerState = TimerState.Playing;

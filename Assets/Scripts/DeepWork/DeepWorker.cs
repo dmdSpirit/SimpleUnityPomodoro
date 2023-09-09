@@ -1,21 +1,21 @@
 ﻿#nullable enable
 
 using System;
+using SimplePomodoro.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SimplePomodoro.UI
+namespace SimplePomodoro.DeepWork
 {
-    public sealed class TimerButtons : MonoBehaviour
+    public sealed class DeepWorker : MonoBehaviour
     {
         private SimpleTimer _timer = null!;
+        private IDisposable? _sub;
+        private bool _isShown;
 
         [SerializeField]
         private Button _startWorkButton = null!;
-
-        [SerializeField]
-        private Button _startRestButton = null!;
 
         [SerializeField]
         private Button _pauseButton = null!;
@@ -24,7 +24,13 @@ namespace SimplePomodoro.UI
         private Button _stopTimerButton = null!;
 
         [SerializeField]
+        private Button _showPomodoro = null!;
+
+        [SerializeField]
         private TMP_Text _pauseButtonText = null!;
+
+        [SerializeField]
+        private TMP_InputField _sessionLength = null!;
 
         [SerializeField]
         private string _pauseText = null!;
@@ -32,29 +38,53 @@ namespace SimplePomodoro.UI
         [SerializeField]
         private string _resumeText = null!;
 
+        [SerializeField]
+        private TimerText _timerText = null!;
+
         private void Awake()
         {
             _startWorkButton.onClick.AddListener(OnStartWork);
-            _startRestButton.onClick.AddListener(OnStartRest);
             _pauseButton.onClick.AddListener(OnPause);
             _stopTimerButton.onClick.AddListener(OnStop);
+            _showPomodoro.onClick.AddListener(OnShowPomodoro);
         }
 
-        private void Start()
+        public void Show()
         {
+            if (_isShown)
+                return;
+            gameObject.SetActive(true);
             _timer = AppStarter.Instance.SimpleTimer;
             _timer.OnStateChanged += OnStateChanged;
             UpdateButtons();
+            _timerText.Show();
+            _isShown = true;
+        }
+
+        public void Hide()
+        {
+            if (_timer != null!)
+            {
+                _timer.Stop();
+                _timer.OnStateChanged -= OnStateChanged;
+            }
+            _timerText.Hide();
+            gameObject.SetActive(false);
+            _isShown = false;
         }
 
         private void OnStartWork()
-            => _timer.StartWork();
-
-        private void OnStartRest()
-            => _timer.StartRest();
+        {
+            if (!int.TryParse(_sessionLength.text, out var session))
+                return;
+            _timer.StartWork(session);
+        }
 
         private void OnStop()
             => _timer.Stop();
+
+        private void OnShowPomodoro()
+            => AppStarter.Instance.ShowPomodoro();
 
         private void OnPause()
             => _timer.Pause();
