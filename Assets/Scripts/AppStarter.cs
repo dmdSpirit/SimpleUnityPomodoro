@@ -1,5 +1,6 @@
 #nullable enable
 using SimplePomodoro.Data;
+using SimplePomodoro.DeepWork;
 using SimplePomodoro.UI;
 using UnityEngine;
 
@@ -14,6 +15,9 @@ namespace SimplePomodoro
 
         [SerializeField]
         private TimerSettings _timerSettings = null!;
+
+        [SerializeField]
+        private PanelsSwitcher _panelsSwitcher = null!;
 
         public static AppStarter Instance
         {
@@ -43,6 +47,12 @@ namespace SimplePomodoro
 
         public TimerSettings TimerSettings => _timerSettings;
 
+        public void ShowPomodoro()
+            => _panelsSwitcher.ShowPomodoro();
+        
+        public void ShowDeepWork()
+            => _panelsSwitcher.ShowDeepWork();
+
         private void Awake()
             => Initialize();
 
@@ -59,6 +69,9 @@ namespace SimplePomodoro
         }
 
         private void StartApp()
-            => SaveController.Load();
+        {
+            SaveController.Load();
+            _panelsSwitcher.ShowPomodoro();
+        }
     }
 }

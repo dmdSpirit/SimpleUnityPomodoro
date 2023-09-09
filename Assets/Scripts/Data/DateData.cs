@@ -6,7 +6,7 @@ namespace SimplePomodoro.Data
     [Serializable]
     public class DateData
     {
-        public string Date;
+        public string Date = null!;
         public int WorkCount;
     }
 }
